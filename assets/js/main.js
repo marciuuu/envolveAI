@@ -10,10 +10,13 @@ if (!usuario_id) {
   localStorage.setItem('usuario_id', usuario_id)
 }
 
-// Função para carregar a frase do dia
+let fraseAtual = null
+
+// Carregar frase do dia
 async function carregarFrase() {
   const hoje = new Date().toISOString().split('T')[0]
 
+  // Verifica se já existe visto hoje
   let { data: visto } = await supabase
     .from('vistos')
     .select('*')
@@ -21,27 +24,50 @@ async function carregarFrase() {
     .eq('data_visualizacao', hoje)
     .single()
 
-  let frase
   if (visto) {
     const { data } = await supabase
       .from('frases')
       .select('*')
       .eq('id', visto.frase_id)
       .single()
-    frase = data
+    fraseAtual = data
   } else {
     const { data } = await supabase.from('frases').select('*')
-    frase = data[Math.floor(Math.random() * data.length)]
+    fraseAtual = data[Math.floor(Math.random() * data.length)]
 
     await supabase.from('vistos').insert({
       usuario_id,
-      frase_id: frase.id,
+      frase_id: fraseAtual.id,
       data_visualizacao: hoje
     })
   }
 
-  document.getElementById('frase').innerText = frase.texto
-  document.getElementById('autor').innerText = frase.autor || ''
+  document.getElementById('frase').innerText = fraseAtual.texto
+  document.getElementById('autor').innerText = fraseAtual.autor || ''
 }
 
+// Favoritar frase
+document.getElementById('favoritar').addEventListener('click', async () => {
+  if (!fraseAtual) return
+  const { error } = await supabase.from('favoritos').insert({
+    usuario_id,
+    frase_id: fraseAtual.id
+  })
+  if (error) {
+    alert('Você já favoritou esta frase!')
+  } else {
+    alert('Frase adicionada aos favoritos! ⭐')
+  }
+})
+
+// Compartilhar frase (copiar para área de transferência)
+document.getElementById('compartilhar').addEventListener('click', () => {
+  if (!fraseAtual) return
+  const texto = `"${fraseAtual.texto}"\n- ${fraseAtual.autor || 'Desconhecido'}`
+  navigator.clipboard.writeText(texto).then(() => {
+    alert('Frase copiada para a área de transferência! 📋')
+  })
+})
+
+// Executa ao carregar a página
 carregarFrase()
