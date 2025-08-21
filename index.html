@@ -4,15 +4,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>envolveAI</title>
+    <title>EnvolveAI</title>
     <!-- CSS do Bootstrap -->
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
 </head>
 
 <body>
+    <div class="container text-center mt-5">
+        <h1>Frase do Dia</h1>
+        <p id="frase" class="fs-4 mt-3">Carregando...</p>
+        <p id="autor" class="fst-italic"></p>
+
+        <button id="favoritar" class="btn btn-primary mt-3">⭐ Favoritar</button>
+        <button id="compartilhar" class="btn btn-success mt-2">📤 Compartilhar</button>
+    </div>
 
     <!-- JS do Bootstrap -->
     <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Seu script principal -->
+    <script type="module" src="main.js"></script>
 </body>
 
 </html>
